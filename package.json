@@ -5,10 +5,10 @@
   "description": "Test flickr app",
   "main": "./src/back-end.js",
   "scripts": {
-    "start": "npm-run-all build express",
+    "start": "npm-run-all webpackDev express",
     "build": "webpack --config webpack.prod.js",
-    "express": "node src/back-end.js",
-    "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "webpackDev": "webpack-dev-server --config webpack.dev.js",
+    "express": "nodemon src/back-end/server.js --watch src/back-end",
     "test": "jest",
     "testWatch": "jest --watch",
     "coverage": "jest --reporters=\"./test/JestNoOutputReporter.js\" --coverage"
@@ -24,6 +24,7 @@
     "html-webpack-plugin": "^3.2.0",
     "jest": "^23.6.0",
     "jest-summarizing-reporter": "^1.1.1",
+    "nodemon": "^1.18.10",
     "npm-run-all": "^4.1.5",
     "style-loader": "^0.23.0",
     "webpack": "^4.20.2",
@@ -40,6 +41,7 @@
   },
   "homepage": "https://github.com/kolesan/flickr-front#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "express": "^4.16.4"
   }
 }
