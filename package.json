@@ -2,8 +2,8 @@
   "name": "flickr-front",
   "version": "1.0.0",
   "private": true,
-  "description": "Client side of the test flickr app",
-  "main": "./src/index.js",
+  "description": "Test flickr app",
+  "main": "./src/back-end.js",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack-dev-server --open --config webpack.dev.js",
@@ -35,5 +35,8 @@
   "bugs": {
     "url": "https://github.com/kolesan/flickr-front/issues"
   },
-  "homepage": "https://github.com/kolesan/flickr-front#readme"
+  "homepage": "https://github.com/kolesan/flickr-front#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
