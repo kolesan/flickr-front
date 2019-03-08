@@ -1,8 +1,13 @@
 const express = require('express');
 const axios = require('axios');
+const config = require('../../config');
 
+console.log(config);
 const app = express();
-const port = 3000;
+let { port } = config.server;
+console.log(port);
+
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 // app.use(express.static("dist"));
 app.use(function(req, res, next) {
@@ -108,5 +113,3 @@ class ValidationError extends Error {
     super(msg)
   }
 }
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
