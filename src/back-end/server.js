@@ -16,17 +16,21 @@ recentPhotosData(100)
   .then(function (response) {
     // console.log(response);
     const photos = response.data.photos.photo;
-    photoSaveForCSsWOrk = photos.map(toPhotoResponseObject);
+    photoSaveForCSsWOrk = photos.filter(hasShortTitle).map(toPhotoResponseObject);
   })
   .catch(function (error) {
     console.log("ERROR:");
     console.log(error);
   });
 
+function hasShortTitle(flickrPhotoData) {
+  return flickrPhotoData.title.length <= 30;
+}
+
 function toPhotoResponseObject(flickrPhotoData) {
   return {
     url: flickrPhotoData.url_m,
-    nsfw: false
+    title: flickrPhotoData.title
   }
 }
 
