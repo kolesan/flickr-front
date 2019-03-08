@@ -5,10 +5,13 @@
   "description": "Test flickr app",
   "main": "./src/back-end.js",
   "scripts": {
-    "start": "npm-run-all webpackDev express",
-    "build": "webpack --config webpack.prod.js",
+    "start": "npm-run-all expressDevNewCMD webpackDevNewCMD testWatchNewCMD",
+    "webpackDevNewCMD": "start npm run webpackDev",
+    "expressDevNewCMD": "start npm run expressDev",
+    "testWatchNewCMD": "start npm run testWatch",
     "webpackDev": "webpack-dev-server --config webpack.dev.js",
-    "express": "nodemon src/back-end/server.js --watch src/back-end",
+    "expressDev": "nodemon src/back-end/server.js --watch src/back-end",
+    "build": "webpack --config webpack.prod.js",
     "test": "jest",
     "testWatch": "jest --watch",
     "coverage": "jest --reporters=\"./test/JestNoOutputReporter.js\" --coverage"
