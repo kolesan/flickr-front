@@ -19,9 +19,15 @@ receivedPhotosPromise
           children: [
             element({
               tag: 'img',
+              classes: "list__item__img",
               attributes: {
                 src: photo.url
               }
+            }),
+            element({
+              tag: 'div',
+              classes: "list__item__title",
+              text: photo.title
             })
           ]
         })
