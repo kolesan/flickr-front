@@ -9,7 +9,7 @@ export const Sizes = {
 
 const { host, port } = config.server;
 export default Object.freeze({
-  getMultiple(count, size){
-    return axios.get(`http://${host}:${port}/photos?count=${count}&size=${size}`);
+  getMultiple(count, page, size){
+    return axios.get(`http://${host}:${port}/photos?count=${count}&page=${page}&size=${size}`);
   }
 })

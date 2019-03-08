@@ -19,7 +19,7 @@ app.use(function(req, res, next) {
 let photoSaveForCSsWOrk = null;
 recentPhotosData(100)
   .then(function (response) {
-    // console.log(response);
+    console.log(response);
     const photos = response.data.photos.photo;
     photoSaveForCSsWOrk = photos.filter(hasShortTitle).map(toPhotoResponseObject);
   })
@@ -40,9 +40,13 @@ function toPhotoResponseObject(flickrPhotoData) {
 }
 
 app.get('/photos', (req, res) => {
-  const count = req.query.count;
+  const count = Number(req.query.count || 0);
+  const page = Number(req.query.page || 0);
 
-  res.send(photoSaveForCSsWOrk.slice(0, count));
+  let startIndex = page * count;
+  let endIndex = startIndex + count;
+  console.log({count, page, startIndex, endIndex, all: photoSaveForCSsWOrk.length});
+  res.send(photoSaveForCSsWOrk.slice(startIndex, endIndex));
   // recentPhotosData(count)
   //   .then(function (response) {
   //     console.log("RESPONSE:");
@@ -67,7 +71,7 @@ function recentPhotosData(count) {
     api_key=1988ffb00086eca7595a0e8ad80025fc&
     safe_search=1&
     content_type=1&
-    tags=nature%2Cscience%2Cfood%2Ccat%2Ccar&
+    tags=nature,science,food,cat,car&
     is_getty=true&
     extras=url_m%2Curl_o&
     per_page=${count}&
