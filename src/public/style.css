@@ -7,11 +7,30 @@ html {
 
 body {
     margin: 0;
+    background-color: #535252;
+
+    display: flex;
+    justify-content: center;
 }
 
-section {
-    width: 100vw;
-    height: 100vh;
-    background: gray;
-    border: 10px solid #535252;
+.list {
+    width: 750px;
+    list-style-type: none;
+    list-style-position: outside;
+    padding: 0;
+}
+
+.list__item {
+    width: 100%;
+    background-color: #5f5e5e;
+    box-shadow: black 1px 1px 2px 1px;
+
+    margin-top: 1rem;
+}
+.list__item:last-child {
+    margin-bottom: 1rem;
+}
+
+.list__item:last-child {
+    margin-bottom: 1rem;
 }
