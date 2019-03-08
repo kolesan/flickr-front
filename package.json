@@ -9,7 +9,7 @@
     "webpackDevNewCMD": "start npm run webpackDev",
     "expressDevNewCMD": "start npm run expressDev",
     "testWatchNewCMD": "start npm run testWatch",
-    "webpackDev": "webpack-dev-server --config webpack.dev.js",
+    "webpackDev": "webpack-dev-server --host 0.0.0.0 --config webpack.dev.js",
     "expressDev": "nodemon src/back-end/server.js --watch src/back-end",
     "build": "webpack --config webpack.prod.js",
     "test": "jest",
