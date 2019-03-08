@@ -14,7 +14,7 @@ body {
 }
 
 .list {
-    min-width: 450px;
+    min-width: 350px;
     width: 100%;
     max-width: 1050px;
     list-style-type: none;
@@ -95,4 +95,16 @@ body {
     text-align: center;
 
     user-select: none;
+}
+
+@media(max-width: 900px) {
+    .list__item__img {
+        width: 100%;
+    }
+    .list__item__title {
+        font-size: 4rem;
+        width: 100%;
+
+        left: 0;
+    }
 }
