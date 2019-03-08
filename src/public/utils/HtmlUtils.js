@@ -1,13 +1,17 @@
 import { log } from "./Logging";
 
-export function element({tag, classes, children = [], attributes = {}, listeners = {}, value, text}) {
+export function element({tag, classes, children = [], attributes = {}, listeners = {}, data = {}, value, text}) {
   let elem = document.createElement(tag);
 
   classes && classes.split(" ").forEach(c => elem.classList.add(c));
   children.forEach(it => elem.appendChild(it));
   Object.keys(attributes).forEach(k => elem.setAttribute(k, attributes[k]));
   Object.keys(listeners).forEach(k => elem.addEventListener(k, listeners[k]));
-  elem.value = value;
+  Object.keys(data).forEach(k => elem.dataset[k] = data[k]);
+
+  if (value !== undefined && value !== null) {
+    elem.value = value;
+  }
 
   if (typeof text == "string" && text.length > 0) {
     elem.appendChild(textNode(text));
