@@ -14,14 +14,14 @@ body {
 }
 
 .list {
-    min-width: 750px;
+    min-width: 450px;
+    width: 100%;
     max-width: 1050px;
     list-style-type: none;
     padding: 0;
 
-    margin: 1rem;
-
     --item-margin: 0.5rem;
+    margin: 0 var(--item-margin);
 }
 
 .list__item {
@@ -32,50 +32,67 @@ body {
     box-shadow: #201720 1px 1px 2px 1px;
 
     margin-top: var(--item-margin);
-    /*padding: 1px;*/
 
-    display: flex;
-    transition: transform ease-in-out 100ms, box-shadow 100ms;
+    overflow: hidden;
+
+    position: relative;
 }
 .list__item:last-child {
     margin-bottom: var(--item-margin);
 }
 .list__item:hover {
-    transform: scale(1.06);
     box-shadow: #201720 2px 2px 3px 2px;
+}
+.list__item:hover > .list__item__img {
+    width: 100%;
+}
+.list__item:hover > .list__item__title {
+    font-size: 4rem;
+    width: 100%;
+
+    left: 0;
 }
 
 .list__item__img {
-    flex-basis: 1fr;
+    position: absolute;
+    top: 0;
+    left: 0;
 
     width: 40%;
     height: 100%;
+
     object-fit: cover;
+
+    transition: width 0.1s ease-out;
 }
 
 .list__item__title {
-    width: 60%;
+    position: absolute;
+    top: 0;
+    left: 40%;
 
-    flex-basis: 1fr;
+    width: 60%;
+    height: 100%;
+
+    padding: 1rem;
+
     text-transform: uppercase;
     font-size: 2rem;
     font-weight: bold;
     font-family: 'Fira Sans', sans-serif;
     letter-spacing: 0.3rem;
+    color: floralwhite;
 
     text-shadow: -1px -1px 2px #3f3f3f,
                  -1px  1px 2px #3f3f3f,
                   1px -1px 2px #3f3f3f,
                   1px  1px 2px #3f3f3f;
 
-    color: floralwhite;
-    opacity: 1;
-
-    height: 100%;
-
     display: flex;
     align-items: center;
     justify-content: center;
 
     text-align: center;
+
+    user-select: none;
 }
