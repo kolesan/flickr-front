@@ -11,42 +11,61 @@ app.use(function(req, res, next) {
   next();
 });
 
+let photoSaveForCSsWOrk = null;
+recentPhotosData(100)
+  .then(function (response) {
+    // console.log(response);
+    const photos = response.data.photos.photo;
+    photoSaveForCSsWOrk = photos.map(toPhotoResponseObject);
+  })
+  .catch(function (error) {
+    console.log("ERROR:");
+    console.log(error);
+  });
+
+function toPhotoResponseObject(flickrPhotoData) {
+  return {
+    url: flickrPhotoData.url_m,
+    nsfw: false
+  }
+}
+
 app.get('/photos', (req, res) => {
   const count = req.query.count;
 
-  recentPhotosData(count)
-    .then(function (response) {
-      // console.log("RESPONSE:");
-      console.log(response);
-      // res.send(response.data);
-      const photos = response.data.photos.photo;
-      res.send(photos.map(photo => photo.url_m));
-    })
-    .catch(function (error) {
-      console.log("ERROR:");
-      // handle error
-      console.log(error);
-    })
-    .then(function () {
-      // always executed
-    })
+  res.send(photoSaveForCSsWOrk.slice(0, count));
+  // recentPhotosData(count)
+  //   .then(function (response) {
+  //     console.log("RESPONSE:");
+  //     console.log(response);
+  //     const photos = response.data.photos.photo;
+  //     res.send(photos.map(photo => photo.url_m));
+  //     res.send(photoSaveForCSsWOrk);
+  //   })
+  //   .catch(function (error) {
+  //     console.log("ERROR:");
+  //     // handle error
+  //     console.log(error);
+  //   })
+  //   .then(function () {
+  //     // always executed
+  //   })
 });
 
 function recentPhotosData(count) {
   return axios.get(noSpaces(`https://api.flickr.com/services/rest/?
-    method=flickr.photos.getRecent&
-    api_key=00ac5f70d662304b87e7da585bbdef9d&
+    method=flickr.photos.search&
+    api_key=1988ffb00086eca7595a0e8ad80025fc&
+    safe_search=1&
+    content_type=1&
+    tags=nature%2Cscience%2Cfood%2Ccat%2Ccar&
+    is_getty=true&
     extras=url_m%2Curl_o&
     per_page=${count}&
     page=0&
     format=json&
     nojsoncallback=1
   `));
-}
-
-function onePhoto(photoData) {
-  let url = photoData.url_m;
-  axios.get(`https://farm6.staticflickr.com/5509/${id}_aff70630a261a66a.jpg`)
 }
 
 app.get('/photos/{id}', (req, res) => {
