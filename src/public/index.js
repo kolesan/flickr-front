@@ -9,46 +9,55 @@ import photoProvider, { Sizes } from './services/Photos';
 import { div } from "./utils/MathUtils";
 import { pushToFront } from "./utils/Utils";
 
+const MAX_BUFFER_SIZE = 100;
+const PHOTO_PAGE_SIZE = 10;
+const OBSERVER_MARGIN = 3 * 300; //3 list items
+
 let list = document.querySelector("#list");
 
 let firstPage = 0;
-let lastPage = 3;
+let lastPage = 0;
 
 let topBuffer = [];
 let bottomBuffer = [];
 
-function isEntryBottom(entry) {
-  return entry.boundingClientRect.top >= 0;
-}
+let bottomObserverLoadCallback = observerCallback((isIntersecting, isBottom, entry) => {
+  if (isBottom && isIntersecting) { // && entry.intersectionRatio < 1
+    window.requestIdleCallback(() => {
+      console.log("Should be loading bot pictures");
+      let count = 1;
+      showPicturesBottom(count);
+      if (bottomBuffer.length < 50) {
+        loadPicturesBottom();
+      }
+      positionBottomLoadObserver(nextNthSibling(entry.target, count));
+      positionBottomHideObserver(nextNthSibling(entry.target, count - 3));
+    });
+  }
+});
+let topObserverLoadCallback = observerCallback((isIntersecting, isBottom, entry) => {
+  let isTop = !isBottom;
+  if (isTop && isIntersecting) { // && entry.intersectionRatio < 1
+    window.requestIdleCallback(() => {
+      console.log("Should be loading top pictures");
+      let count = 1;
+      showPicturesTop(count);
+      if (topBuffer.length < 50) {
+        loadPicturesTop();
+      }
+      positionTopLoadObserver(nextNthSibling(entry.target, -count));
+      positionTopHideObserver(nextNthSibling(entry.target, -count + 3));
+    });
+  }
+});
+
 let bottomObserverHideCallback = observerCallback((isIntersecting, isBottom, entry) => {
   if (isBottom && !isIntersecting) {
     console.log("Should be hiding bot pictures");
     let count = 1;
     hidePicturesBottom(count);
     positionBottomHideObserver(nextNthSibling(entry.target, -count));
-    positionBottomLoadObserver(nextNthSibling(entry.target, 2));
-  }
-});
-let bottomObserverLoadCallback = observerCallback((isIntersecting, isBottom, entry) => {
-  if (isBottom && isIntersecting && entry.intersectionRatio < 1) {
-    console.log("Should be loading bot pictures");
-    let count = 1;
-    showPicturesBottom(count);
-    if (bottomBuffer.length < 10) {
-      loadPicturesBottom();
-    }
-    positionBottomLoadObserver(nextNthSibling(entry.target, count));
-    positionBottomHideObserver(nextNthSibling(entry.target, -2));
-  }
-});
-let topObserverLoadCallback = observerCallback((isIntersecting, isBottom, entry) => {
-  let isTop = !isBottom;
-  if (isTop && isIntersecting && entry.intersectionRatio < 1) {
-    console.log("Should be loading top pictures");
-    let count = 1;
-    showPicturesTop(count);
-    positionTopLoadObserver(nextNthSibling(entry.target, -count));
-    positionTopHideObserver(nextNthSibling(entry.target, 2));
+    positionBottomLoadObserver(nextNthSibling(entry.target, -count + 3));
   }
 });
 let topObserverHideCallback = observerCallback((isIntersecting, isBottom, entry) => {
@@ -58,9 +67,13 @@ let topObserverHideCallback = observerCallback((isIntersecting, isBottom, entry)
     let count = 1;
     hidePicturesTop(count);
     positionTopHideObserver(nextNthSibling(entry.target, count));
-    positionTopLoadObserver(entry.target);
+    positionTopLoadObserver(nextNthSibling(entry.target, count - 3));
   }
 });
+
+function isEntryBottom(entry) {
+  return entry.boundingClientRect.top >= 0;
+}
 function observerCallback(fn) {
   return function(entries, observer) {
     let entry = entries[0];
@@ -71,14 +84,12 @@ function observerCallback(fn) {
   }
 }
 
-let observerOptions = {
-  rootMargin: "600px 0px"
-};
-// let hideObserverOptions = {
-//
-// };
 
-let bottomHideObserver = new IntersectionObserver(bottomObserverHideCallback ,observerOptions);
+let observerOptions = {
+  rootMargin: `${OBSERVER_MARGIN}px 0px`
+};
+
+let bottomHideObserver = new IntersectionObserver(bottomObserverHideCallback, observerOptions);
 let topHideObserver = new IntersectionObserver(topObserverHideCallback, observerOptions);
 let bottomLoadObserver = new IntersectionObserver(bottomObserverLoadCallback, observerOptions);
 let topLoadObserver = new IntersectionObserver(topObserverLoadCallback, observerOptions);
@@ -89,7 +100,7 @@ loadPicturesBottom()
   .then(loadPicturesBottom)
   .then(() => {
     showPicturesBottom(20);
-    positionTopHideObserver(list.children[5]);
+    positionTopHideObserver(list.children[9]);
     positionBottomLoadObserver(list.children[14]);
   })
   .then(loadPicturesBottom)
@@ -107,30 +118,35 @@ function loadPicturesBottom() {
     .then(resp => generateListItems(resp.data))
     .then(listItems => {
       bottomBuffer.push(...listItems);
-      log("bottomBuffer loaded", bottomBuffer);
+      log("bottomBuffer loaded", bottomBuffer.length);
       return listItems;
     });
 }
 function loadPicturesTop() {
-  firstPage--;
-  return getPhotos(firstPage)
-    .then(resp => generateListItems(resp.data))
-    .then(listItems => {
-      pushToFront(topBuffer, listItems);
-      return listItems;
-    });
+  if (firstPage > 0) {
+    firstPage--;
+    log(`First page --`, firstPage);
+    return getPhotos(firstPage)
+      .then(resp => generateListItems(resp.data))
+      .then(listItems => {
+        pushToFront(topBuffer, ...listItems);
+        log("topBuffer loaded", topBuffer.length);
+        return listItems;
+      });
+  }
+  return [];
 }
 
 function showPicturesBottom(count) {
   let listItems = bottomBuffer.splice(0, count);
   appendChildrenToTail(list, listItems);
-  log("bottomBuffer", bottomBuffer);
+  log("bottomBuffer", bottomBuffer.length);
   return listItems;
 }
 function showPicturesTop(count) {
   let listItems = topBuffer.splice(-count);
   appendChildrenToHead(list, listItems);
-  log("topBuffer", topBuffer);
+  log("topBuffer", topBuffer.length, listItems);
 }
 
 function hidePicturesBottom(count) {
@@ -138,14 +154,24 @@ function hidePicturesBottom(count) {
     return i >= list.children.length - count;
   });
   pushToFront(bottomBuffer, ...removedListItems);
-  log("bottomBuffer", bottomBuffer);
+  while(bottomBuffer.length >= MAX_BUFFER_SIZE + PHOTO_PAGE_SIZE) {
+    log(`Shortening bottom buffer by ${PHOTO_PAGE_SIZE}`);
+    bottomBuffer.splice(-PHOTO_PAGE_SIZE);
+  }
+  log("bottomBuffer", bottomBuffer.length);
 }
 function hidePicturesTop(count) {
   let removedListItems = removeChildNodes(list, (child, i) =>
     i < count
   );
   topBuffer.push(...removedListItems);
-  log("topBuffer", topBuffer);
+  while(topBuffer.length >= MAX_BUFFER_SIZE + PHOTO_PAGE_SIZE) {
+    log(`Shortening top buffer by ${PHOTO_PAGE_SIZE}`);
+    firstPage++;
+    log(`First page ++`, firstPage);
+    topBuffer.splice(0, PHOTO_PAGE_SIZE);
+  }
+  log("topBuffer", topBuffer.length);
 }
 
 
