@@ -23,3 +23,46 @@ export function element({tag, classes, children = [], attributes = {}, listeners
 export function textNode(v) {
   return document.createTextNode(v);
 }
+
+export function removeChildNodes(parent, predicate = ()=>true) {
+  let removedChildren = [];
+  let children = Array.from(parent.children);
+
+  children.forEach((child, i) => {
+    if (predicate(child, i)) {
+      let removedChild = parent.removeChild(child);
+      removedChildren.push(removedChild);
+    }
+  });
+
+  return removedChildren;
+}
+
+export function appendChildrenToHead(parent, children) {
+  let firstChild = parent.firstChild;
+  children.forEach(child =>
+    parent.insertBefore(child, firstChild)
+  );
+  return children;
+}
+
+export function appendChildrenToTail(parent, children) {
+  children.forEach(child => parent.appendChild(child));
+  return children;
+}
+
+export function nextNthSibling(node, n) {
+  let prop = "nextElementSibling";
+  if (n < 0) {
+    n *= -1;
+    prop = "previousElementSibling";
+  }
+
+  let previousNode = null;
+  for(let i = 0; i < n && node !== null; i++){
+    previousNode = node;
+    node = node[prop];
+  }
+
+  return node || previousNode;
+}
