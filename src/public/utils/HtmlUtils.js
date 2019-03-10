@@ -51,7 +51,7 @@ export function appendChildrenToTail(parent, children) {
   return children;
 }
 
-export function nextNthSibling(node, n) {
+export function nextSibling(node, n = 1) {
   let prop = "nextElementSibling";
   if (n < 0) {
     n *= -1;
