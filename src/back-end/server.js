@@ -16,20 +16,26 @@ app.use(function(req, res, next) {
   next();
 });
 
-let photoSaveForCSsWOrk = null;
-recentPhotosData(100)
-  .then(function (response) {
-    console.log(response);
-    const photos = response.data.photos.photo;
-    photoSaveForCSsWOrk = photos.filter(hasShortTitle).map(toPhotoResponseObject);
-  })
-  .catch(function (error) {
-    console.log("ERROR:");
-    console.log(error);
-  });
+let page = 0;
+let photoSaveForCSsWOrk = [];
+loadSomeTestPhotos();
+
+function loadSomeTestPhotos() {
+  searchPhotos(100, page++)
+    .then(function (response) {
+      // console.log(response);
+      const photos = response.data.photos.photo;
+      photoSaveForCSsWOrk.push(...photos.filter(hasShortTitle).map(toPhotoResponseObject));
+    })
+    .catch(function (error) {
+      console.log("ERROR:");
+      console.log(error);
+    });
+}
 
 function hasShortTitle(flickrPhotoData) {
-  return flickrPhotoData.title.length <= 30;
+  let titleLength = flickrPhotoData.title.length;
+  return titleLength > 0 && titleLength <= 30;
 }
 
 function toPhotoResponseObject(flickrPhotoData) {
@@ -40,14 +46,18 @@ function toPhotoResponseObject(flickrPhotoData) {
 }
 
 app.get('/photos', (req, res) => {
-  const count = Number(req.query.count || 0);
+  // const count = Number(req.query.count || 0);
+  const count = 10;
   const page = Number(req.query.page || 0);
 
   let startIndex = page * count;
   let endIndex = startIndex + count;
+  if (endIndex > photoSaveForCSsWOrk.length - 50) {
+    loadSomeTestPhotos();
+  }
   console.log({count, page, startIndex, endIndex, all: photoSaveForCSsWOrk.length});
   res.send(photoSaveForCSsWOrk.slice(startIndex, endIndex));
-  // recentPhotosData(count)
+  // searchPhotos(count)
   //   .then(function (response) {
   //     console.log("RESPONSE:");
   //     console.log(response);
@@ -65,17 +75,17 @@ app.get('/photos', (req, res) => {
   //   })
 });
 
-function recentPhotosData(count) {
+function searchPhotos(count = 20, page = 0) {
   return axios.get(noSpaces(`https://api.flickr.com/services/rest/?
     method=flickr.photos.search&
-    api_key=1988ffb00086eca7595a0e8ad80025fc&
+    api_key=00ac5f70d662304b87e7da585bbdef9d&
     safe_search=1&
     content_type=1&
     tags=nature,science,food,cat,car&
     is_getty=true&
     extras=url_m%2Curl_o&
     per_page=${count}&
-    page=0&
+    page=${page}&
     format=json&
     nojsoncallback=1
   `));
