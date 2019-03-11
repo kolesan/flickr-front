@@ -45,6 +45,7 @@
   "homepage": "https://github.com/kolesan/flickr-front#readme",
   "dependencies": {
     "axios": "^0.18.0",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "intersection-observer": "^0.5.1"
   }
 }

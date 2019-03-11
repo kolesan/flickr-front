@@ -1,4 +1,5 @@
 import './style.css';
+import 'intersection-observer';
 
 import log from "./utils/Logging";
 import {
