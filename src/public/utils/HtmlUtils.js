@@ -1,6 +1,6 @@
 import { log } from "./Logging";
 
-export function element({tag, classes, children = [], attributes = {}, listeners = {}, data = {}, value, text}) {
+export function element({tag, classes, children = [], attributes = {}, listeners = {}, data = {}, style = {}, value, text}) {
   let elem = document.createElement(tag);
 
   classes && classes.split(" ").forEach(c => elem.classList.add(c));
@@ -8,6 +8,8 @@ export function element({tag, classes, children = [], attributes = {}, listeners
   Object.keys(attributes).forEach(k => elem.setAttribute(k, attributes[k]));
   Object.keys(listeners).forEach(k => elem.addEventListener(k, listeners[k]));
   Object.keys(data).forEach(k => elem.dataset[k] = data[k]);
+
+  Object.assign(elem.style, style);
 
   if (value !== undefined && value !== null) {
     elem.value = value;
@@ -24,29 +26,7 @@ export function textNode(v) {
   return document.createTextNode(v);
 }
 
-export function removeChildNodes(parent, predicate = ()=>true) {
-  let removedChildren = [];
-  let children = Array.from(parent.children);
-
-  children.forEach((child, i) => {
-    if (predicate(child, i)) {
-      let removedChild = parent.removeChild(child);
-      removedChildren.push(removedChild);
-    }
-  });
-
-  return removedChildren;
-}
-
-export function appendChildrenToHead(parent, ...children) {
-  let firstChild = parent.firstChild;
-  children.forEach(child =>
-    parent.insertBefore(child, firstChild)
-  );
-  return children;
-}
-
-export function appendChildrenToTail(parent, ...children) {
+export function appendChildren(parent, ...children) {
   children.forEach(child => parent.appendChild(child));
   return children;
 }
