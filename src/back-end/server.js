@@ -52,9 +52,9 @@ app.get('/photos', (req, res) => {
 
   let startIndex = page * count;
   let endIndex = startIndex + count;
-  if (endIndex > photoSaveForCSsWOrk.length - 50) {
-    loadSomeTestPhotos();
-  }
+  // if (endIndex > photoSaveForCSsWOrk.length - 50) {
+  //   loadSomeTestPhotos();
+  // }
   console.log({count, page, startIndex, endIndex, all: photoSaveForCSsWOrk.length});
   res.send(photoSaveForCSsWOrk.slice(startIndex, endIndex));
   // searchPhotos(count)

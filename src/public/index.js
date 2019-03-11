@@ -2,17 +2,19 @@ import './style.css';
 
 import log from "./utils/Logging";
 import {
-  appendChildrenToHead, appendChildrenToTail, element, nextSibling,
+  appendChildrenToHead, appendChildrenToTail, element,
   removeChildNodes
 } from "./utils/HtmlUtils";
 import photoProvider, { Sizes } from './services/Photos';
 import { div } from "./utils/MathUtils";
 import { pushToFront } from "./utils/Utils";
+import { ifAny } from "./utils/FunctionalUtils";
 
 const MAX_BUFFER_SIZE = 100;
 const PHOTO_PAGE_SIZE = 10;
 const OBSERVER_MARGIN = 3 * 300; //3 list items
 const ITEM_LOAD_COUNT = 1;
+const ITEM_HEIGHT = 300 + 8; //Height + margin
 
 let list = document.querySelector("#list");
 
@@ -21,53 +23,64 @@ let lastPage = 0;
 
 let topBuffer = [];
 let bottomBuffer = [];
+let paddingTop = 0;
+let paddingBot = 0;
 
-// let topTarget;
-// let botTarget;
+function addPicturesBot(count) {
+  showPicturesBot(count)
+    [ifAny](shown => {
+      positionBotLoadObserver(list.children[list.children.length - 4]);
 
-let bottomObserverLoadCallback = observerCallback((isIntersecting, isBottom) => {
-  if (isBottom && isIntersecting) {
-    // setTimeout(() => {
+      hidePicturesTop(shown.length)
+        [ifAny](hidden => {
+          positionTopLoadObserver(list.children[3]);
+        })
+    });
+}
+let bottomObserverCallback = observerCallback((isIntersecting, isBottom) => {
+  console.log("BOT TRIGGERED");
+  if (isIntersecting || !isBottom) {
     console.log("BOT LOAD");
 
-    botObserver.disconnect();
-    topObserver.disconnect();
-
-    let shownPictures = showPicturesBot(ITEM_LOAD_COUNT);
-    if (shownPictures) {
-      hidePicturesTop(ITEM_LOAD_COUNT);
-    }
-
-    positionTopLoadObserver(list.children[3]);
-    positionBotLoadObserver(list.children[16]);
+    addPicturesBot(ITEM_LOAD_COUNT);
 
     if (bottomBuffer.length < 50) {
-      loadPicturesBottom();
+      requestPicturesBottom()
+        .then(pictures => {
+          if (pictures.length > 0) {
+            addPicturesBot(ITEM_LOAD_COUNT);
+          }
+        });
     }
-    // }, 0);
   }
 });
-let topObserverLoadCallback = observerCallback((isIntersecting, isBottom) => {
-  // console.log("TOP OBSERVER TRIGGERED");
-  if (!isBottom && isIntersecting) {
-    // setTimeout(() => {
-      console.log("TOP LOAD");
 
-      botObserver.disconnect();
-      topObserver.disconnect();
-
-      let shownPictures = showPicturesTop(ITEM_LOAD_COUNT);
-      if (shownPictures.length > 0) {
-        hidePicturesBot(ITEM_LOAD_COUNT);
-      }
-
+function addPicturesTop(count) {
+  showPicturesTop(count)
+    [ifAny](shown => {
       positionTopLoadObserver(list.children[3]);
-      positionBotLoadObserver(list.children[16]);
 
-      if (topBuffer.length < 50) {
-        loadPicturesTop();
-      }
-    // }, 0);
+      hidePicturesBot(shown.length)
+        [ifAny](hidden => {
+          positionBotLoadObserver(list.children[list.children.length - 4]);
+        })
+    });
+}
+let topObserverCallback = observerCallback((isIntersecting, isBottom) => {
+  console.log("TOP TRIGGERED");
+  if (isIntersecting || isBottom) {
+    console.log("TOP LOAD");
+
+    addPicturesTop(ITEM_LOAD_COUNT);
+
+    if (topBuffer.length < 50) {
+      loadPicturesTop()
+        .then(loadedPictures => {
+          if (loadedPictures.length > 0) {
+            addPicturesTop(ITEM_LOAD_COUNT);
+          }
+        });
+    }
   }
 });
 
@@ -89,31 +102,25 @@ let observerOptions = {
   rootMargin: `${OBSERVER_MARGIN}px 0px`
 };
 
-let botObserver = new IntersectionObserver(bottomObserverLoadCallback, observerOptions);
-let topObserver = new IntersectionObserver(topObserverLoadCallback, observerOptions);
+let botObserver = new IntersectionObserver(bottomObserverCallback, observerOptions);
+let topObserver = new IntersectionObserver(topObserverCallback, observerOptions);
 
-loadPicturesBottom()
-  .then(loadPicturesBottom)
+requestPicturesBottom()
+  .then(requestPicturesBottom)
   .then(() => {
     showPicturesBot(20);
-
-    // topTarget = list.children[9];
-    // botTarget = list.children[14];
-    // positionTopLoadObserver(topTarget);
-    // positionBotLoadObserver(botTarget);
-    positionTopLoadObserver(list.children[3]);
-    positionBotLoadObserver(list.children[16]);
+    positionBotLoadObserver(list.children[list.children.length - 4]);
   })
-  .then(loadPicturesBottom)
-  .then(loadPicturesBottom)
-  .then(loadPicturesBottom)
-  .then(loadPicturesBottom);
+  .then(requestPicturesBottom)
+  .then(requestPicturesBottom)
+  .then(requestPicturesBottom)
+  .then(requestPicturesBottom);
 
 function getPhotos(page) {
   return photoProvider.getMultiple(page, Sizes.m);
 }
 
-function loadPicturesBottom() {
+function requestPicturesBottom() {
   lastPage++;
   return getPhotos(lastPage)
     .then(resp => generateListItems(resp.data))
@@ -135,19 +142,31 @@ function loadPicturesTop() {
         return listItems;
       });
   }
-  return [];
+  return Promise.resolve([]);
+}
+
+
+function adjustBotPadding(times) {
+  paddingBot += times * ITEM_HEIGHT; //Height + margin
+  list.style.paddingBot = Math.max(0, paddingBot) + "px";
+}
+function adjustTopPadding(times) {
+  paddingTop += times * ITEM_HEIGHT; //Height + margin
+  list.style.paddingTop = Math.max(0, paddingTop) + "px";
 }
 
 function showPicturesBot(count) {
   let listItems = bottomBuffer.splice(0, count);
-  appendChildrenToTail(list, listItems);
   log("bottomBuffer", bottomBuffer.length);
+  appendChildrenToTail(list, listItems);
+  adjustBotPadding(-listItems.length);
   return listItems;
 }
 function showPicturesTop(count) {
   let listItems = topBuffer.splice(-count);
-  appendChildrenToHead(list, listItems);
   log("topBuffer", topBuffer.length, listItems);
+  appendChildrenToHead(list, listItems);
+  adjustTopPadding(-listItems.length);
   return listItems;
 }
 
@@ -161,6 +180,8 @@ function hidePicturesBot(count) {
     bottomBuffer.splice(-PHOTO_PAGE_SIZE);
   }
   log("bottomBuffer", bottomBuffer.length);
+  adjustBotPadding(removedListItems.length);
+  return removedListItems;
 }
 function hidePicturesTop(count) {
   let removedListItems = removeChildNodes(list, (child, i) =>
@@ -174,6 +195,8 @@ function hidePicturesTop(count) {
     topBuffer.splice(0, PHOTO_PAGE_SIZE);
   }
   log("topBuffer", topBuffer.length);
+  adjustTopPadding(removedListItems.length);
+  return removedListItems;
 }
 
 
@@ -201,11 +224,13 @@ let topLoadDebugElem = debugElem("TOP LOAD", "red");
 function positionTopLoadObserver(target) {
   target.appendChild(topLoadDebugElem);
 
+  topObserver.disconnect();
   topObserver.observe(target);
 }
 function positionBotLoadObserver(target) {
   target.appendChild(bottomLoadDebugElem);
 
+  botObserver.disconnect();
   botObserver.observe(target);
 }
 

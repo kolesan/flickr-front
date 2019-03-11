@@ -50,19 +50,3 @@ export function appendChildrenToTail(parent, children) {
   children.forEach(child => parent.appendChild(child));
   return children;
 }
-
-export function nextSibling(node, n = 1) {
-  let prop = "nextElementSibling";
-  if (n < 0) {
-    n *= -1;
-    prop = "previousElementSibling";
-  }
-
-  let previousNode = null;
-  for(let i = 0; i < n && node !== null; i++){
-    previousNode = node;
-    node = node[prop];
-  }
-
-  return node || previousNode;
-}
