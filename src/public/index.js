@@ -8,7 +8,7 @@ import {
 } from "./utils/HtmlUtils";
 import photoProvider, { Sizes } from './services/Photos';
 import { div } from "./utils/MathUtils";
-import { pushToFront } from "./utils/Utils";
+import { minmax, pushToFront } from "./utils/Utils";
 import { ifAny } from "./utils/FunctionalUtils";
 import newControlPanelInst from "./components/control_panel";
 import controlPanelIndicator from "./components/control_panel_indicator";
@@ -16,19 +16,25 @@ import controlPanelIndicator from "./components/control_panel_indicator";
 const MAX_BUFFER_SIZE = 100;
 const PHOTO_PAGE_SIZE = 10;
 const OBSERVER_MARGIN = 3 * 300; //3 list items
-const ITEM_LOAD_COUNT = 1;
 const ITEM_HEIGHT = 300 + 8; //Height + margin
 
 let detachTopMode = true;
+let itemLoadCount = 1;
 
 let controlPanel = newControlPanelInst();
-let { topDetachmentBtn } = controlPanel.buttons;
+let { topDetachmentBtn, loadCountInput } = controlPanel.components;
 topDetachmentBtn.setState(detachTopMode);
 topDetachmentBtn.bindClick(() => {
   detachTopMode = !detachTopMode;
   topDetachmentBtn.setState(detachTopMode);
 });
-
+loadCountInput.value = itemLoadCount;
+let minMax1to10 = minmax(1, 10);
+loadCountInput.onBlur(event => {
+  itemLoadCount = minMax1to10(Number(event.target.value));
+  loadCountInput.value = itemLoadCount;
+  log(itemLoadCount);
+});
 appendChildrenToTail(document.body, controlPanelIndicator, controlPanel.element);
 
 
@@ -60,13 +66,13 @@ let bottomObserverCallback = observerCallback((isIntersecting, isBottom) => {
   if (isIntersecting || !isBottom) {
     console.log("BOT LOAD");
 
-    moveListTop(ITEM_LOAD_COUNT);
+    moveListTop(itemLoadCount);
 
     if (bottomBuffer.length < 50) {
       requestPicturesBottom()
         .then(pictures => {
           if (pictures.length > 0) {
-            moveListTop(ITEM_LOAD_COUNT);
+            moveListTop(itemLoadCount);
           }
         });
     }
@@ -89,13 +95,13 @@ let topObserverCallback = observerCallback((isIntersecting, isBottom) => {
   if (isIntersecting || isBottom) {
     console.log("TOP LOAD");
 
-    addPicturesTop(ITEM_LOAD_COUNT);
+    addPicturesTop(itemLoadCount);
 
     if (topBuffer.length < 50) {
       loadPicturesTop()
         .then(loadedPictures => {
           if (loadedPictures.length > 0) {
-            addPicturesTop(ITEM_LOAD_COUNT);
+            addPicturesTop(itemLoadCount);
           }
         });
     }
@@ -243,9 +249,7 @@ function positionTopLoadObserver(target) {
   target.appendChild(topLoadDebugElem);
 
   topObserver.disconnect();
-  if (detachTopMode) {
-    topObserver.observe(target);
-  }
+  topObserver.observe(target);
 }
 function positionBotLoadObserver(target) {
   target.appendChild(bottomLoadDebugElem);

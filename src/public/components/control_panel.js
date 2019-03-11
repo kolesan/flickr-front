@@ -1,14 +1,16 @@
 import './control_panel.css';
 
-import { element } from "../utils/HtmlUtils";
+import { element, textNode } from "../utils/HtmlUtils";
 
 export default function inst() {
   let topDetachmentBtn = topDetachmentBtnCmp();
+  let loadCountInput = loadCountInputCmp();
   let gridModeBtn = gridModeBtnCmp();
 
   return {
-    buttons: {
+    components: {
       topDetachmentBtn,
+      loadCountInput,
       gridModeBtn
     },
     element: element({
@@ -16,6 +18,7 @@ export default function inst() {
       classes: "control_panel",
       children: [
         topDetachmentBtn.element,
+        loadCountInput.element,
         gridModeBtn.element
       ]
     })
@@ -25,8 +28,7 @@ export default function inst() {
 function topDetachmentBtnCmp() {
   let buttonElement = element({
     tag: "button",
-    classes: `control_panel__button`,
-    text: "detach top"
+    classes: `control_panel__item button`
   });
 
   return {
@@ -36,20 +38,51 @@ function topDetachmentBtnCmp() {
     element: buttonElement,
     setState(state) {
       if (state) {
-        buttonElement.classList.add("control_panel__button-active");
-        buttonElement.innerHTML = "DETACH TOP ENABLED"
+        buttonElement.classList.add("button-active");
+        buttonElement.innerHTML = "TOP OBSERVER ENABLED"
       } else {
-        buttonElement.classList.remove("control_panel__button-active");
-        buttonElement.innerHTML = "DETACH TOP DISABLED"
+        buttonElement.classList.remove("button-active");
+        buttonElement.innerHTML = "TOP OBSERVER DISABLED"
       }
     }
   };
 }
+
+function loadCountInputCmp() {
+  let input = element({
+    tag: "input",
+    classes: `control_panel__item input`,
+    attributes: {
+      type: "number",
+      min: 1,
+      max: 10
+    }
+  });
+  let label = element({
+    tag: "label",
+    classes: `control_panel__item label`,
+    children: [
+      textNode("LOAD COUNT"),
+      input
+    ]
+  });
+
+  return {
+    set value(v) {
+      input.value = v;
+    },
+    onBlur(cb) {
+      input.addEventListener("blur", cb);
+    },
+    element: label
+  };
+}
+
 function gridModeBtnCmp(params) {
   let buttonElement = element({
     tag: "button",
-    classes: "control_panel__button",
-    text: "grid mode",
+    classes: "control_panel__item button",
+    text: "grid mode disabled",
     attributes: {
       disabled: true
     },
