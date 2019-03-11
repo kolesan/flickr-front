@@ -9,12 +9,27 @@ import photoProvider, { Sizes } from './services/Photos';
 import { div } from "./utils/MathUtils";
 import { pushToFront } from "./utils/Utils";
 import { ifAny } from "./utils/FunctionalUtils";
+import newControlPanelInst from "./components/control_panel";
+import controlPanelIndicator from "./components/control_panel_indicator";
 
 const MAX_BUFFER_SIZE = 100;
 const PHOTO_PAGE_SIZE = 10;
 const OBSERVER_MARGIN = 3 * 300; //3 list items
 const ITEM_LOAD_COUNT = 1;
 const ITEM_HEIGHT = 300 + 8; //Height + margin
+
+let detachTopMode = true;
+
+let controlPanel = newControlPanelInst();
+let { topDetachmentBtn } = controlPanel.buttons;
+topDetachmentBtn.setState(detachTopMode);
+topDetachmentBtn.bindClick(() => {
+  detachTopMode = !detachTopMode;
+  topDetachmentBtn.setState(detachTopMode);
+});
+
+appendChildrenToTail(document.body, controlPanelIndicator, controlPanel.element);
+
 
 let list = document.querySelector("#list");
 
@@ -26,15 +41,17 @@ let bottomBuffer = [];
 let paddingTop = 0;
 let paddingBot = 0;
 
-function addPicturesBot(count) {
+function moveListTop(count) {
   showPicturesBot(count)
     [ifAny](shown => {
       positionBotLoadObserver(list.children[list.children.length - 4]);
 
-      hidePicturesTop(shown.length)
-        [ifAny](hidden => {
-          positionTopLoadObserver(list.children[3]);
-        })
+      if (detachTopMode) {
+        hidePicturesTop(shown.length)
+          [ifAny](hidden => {
+            positionTopLoadObserver(list.children[3]);
+          })
+      }
     });
 }
 let bottomObserverCallback = observerCallback((isIntersecting, isBottom) => {
@@ -42,13 +59,13 @@ let bottomObserverCallback = observerCallback((isIntersecting, isBottom) => {
   if (isIntersecting || !isBottom) {
     console.log("BOT LOAD");
 
-    addPicturesBot(ITEM_LOAD_COUNT);
+    moveListTop(ITEM_LOAD_COUNT);
 
     if (bottomBuffer.length < 50) {
       requestPicturesBottom()
         .then(pictures => {
           if (pictures.length > 0) {
-            addPicturesBot(ITEM_LOAD_COUNT);
+            moveListTop(ITEM_LOAD_COUNT);
           }
         });
     }
@@ -158,14 +175,14 @@ function adjustTopPadding(times) {
 function showPicturesBot(count) {
   let listItems = bottomBuffer.splice(0, count);
   log("bottomBuffer", bottomBuffer.length);
-  appendChildrenToTail(list, listItems);
+  appendChildrenToTail(list, ...listItems);
   adjustBotPadding(-listItems.length);
   return listItems;
 }
 function showPicturesTop(count) {
   let listItems = topBuffer.splice(-count);
   log("topBuffer", topBuffer.length, listItems);
-  appendChildrenToHead(list, listItems);
+  appendChildrenToHead(list, ...listItems);
   adjustTopPadding(-listItems.length);
   return listItems;
 }
@@ -225,7 +242,9 @@ function positionTopLoadObserver(target) {
   target.appendChild(topLoadDebugElem);
 
   topObserver.disconnect();
-  topObserver.observe(target);
+  if (detachTopMode) {
+    topObserver.observe(target);
+  }
 }
 function positionBotLoadObserver(target) {
   target.appendChild(bottomLoadDebugElem);

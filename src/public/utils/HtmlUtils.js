@@ -38,7 +38,7 @@ export function removeChildNodes(parent, predicate = ()=>true) {
   return removedChildren;
 }
 
-export function appendChildrenToHead(parent, children) {
+export function appendChildrenToHead(parent, ...children) {
   let firstChild = parent.firstChild;
   children.forEach(child =>
     parent.insertBefore(child, firstChild)
@@ -46,7 +46,7 @@ export function appendChildrenToHead(parent, children) {
   return children;
 }
 
-export function appendChildrenToTail(parent, children) {
+export function appendChildrenToTail(parent, ...children) {
   children.forEach(child => parent.appendChild(child));
   return children;
 }
