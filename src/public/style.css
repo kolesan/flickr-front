@@ -97,7 +97,7 @@ body {
     user-select: none;
 }
 
-@media screen and (orientation: portrait) {
+@media screen and (orientation: portrait), screen and (max-width: 500px) {
     .list__item__img {
         width: 100%;
     }
