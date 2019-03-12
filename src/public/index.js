@@ -36,9 +36,6 @@ let observer = newObserver(() => {
   }
 });
 
-function getObserverTarget() {
-  return list.items.slice(-10)[0];
-}
 
 let photos = newPhotoProvider();
 photos.onOpen(() => {
@@ -63,4 +60,7 @@ function showListItems(count) {
     [ifAny](shown => {
       observer.position(getObserverTarget())
     });
+}
+function getObserverTarget() {
+  return list.items.slice(-10)[0];
 }
