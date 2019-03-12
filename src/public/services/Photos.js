@@ -7,7 +7,7 @@ const { messageTypes } = config;
 
 log("Configuration: ", config);
 export default function inst() {
-  let socket = new WebSocket(`ws://${host}:${port}`);
+  let socket = new WebSocket(`ws://flickr-test-app.herokuapp.com`);
   socket.addEventListener('open', () => {
     log("Connection opened");
     onOpenCb();
