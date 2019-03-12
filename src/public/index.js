@@ -20,10 +20,10 @@ let showCountInput = newControlPanelNumberInput({
   name: "showCount",
   onChange: value => showCount = value
 });
-newControlPanel(document.body, showCountInput);
 
 let reserve = newReserve();
 let list = newList(document.body);
+newControlPanel(document.body, showCountInput);
 let observer = newObserver(() => {
   // console.log("OBSERVER CB TRIGGERED: LOADING PICTURES");
   showReserved()
@@ -54,13 +54,13 @@ photos.onReceived(pictures => {
 function showReserved() {
   return showListItems(reserve.reserved)
     [ifAny](shown => {
-    reserve.remove(shown.length);
-  });
+      reserve.remove(shown.length);
+    });
 }
 
 function showListItems(count) {
   return list.show(count)
     [ifAny](shown => {
-    observer.position(getObserverTarget())
-  });
+      observer.position(getObserverTarget())
+    });
 }
