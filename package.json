@@ -5,7 +5,7 @@
   "description": "Test flickr app",
   "main": "./src/back-end.js",
   "scripts": {
-    "start": "npm run build && npm run server",
+    "start": "node src/back-end/server.js prod",
     "startDev": "npm-run-all serverDevNewCMD clientDevNewCMD testWatchNewCMD",
     "clientDevNewCMD": "start npm run clientDev",
     "serverDevNewCMD": "start npm run serverDev",
