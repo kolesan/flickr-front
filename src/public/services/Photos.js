@@ -7,7 +7,7 @@ const { messageTypes } = config;
 
 log("Configuration: ", config);
 export default function inst() {
-  let socket = new WebSocket(`ws://flickr-test-app.netlify.com/.netlify/functions/server`);
+  let socket = new WebSocket(`wss://flickr-test-app.netlify.com/.netlify/functions/server`);
   socket.addEventListener('open', () => {
     log("Connection opened");
     onOpenCb();
