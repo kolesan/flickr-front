@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Test flickr app",
-  "main": "./src/back-end.js",
+  "main": "functions/server.js",
   "scripts": {
     "start": "npm-run-all serverDevNewCMD clientDevNewCMD testWatchNewCMD",
     "clientDevNewCMD": "start npm run clientDev",
@@ -15,6 +15,7 @@
     "server": "node src/back-end/server.js prod",
     "build": "webpack --config webpack.prod.js",
     "test": "jest",
+    "netlifyBuild": "netlify-lambda build express",
     "testWatch": "jest --watch",
     "coverage": "jest --reporters=\"./test/JestNoOutputReporter.js\" --coverage"
   },
@@ -47,8 +48,10 @@
   "homepage": "https://github.com/kolesan/flickr-front#readme",
   "dependencies": {
     "axios": "^0.18.0",
+    "express": "^4.16.4",
     "intersection-observer": "^0.5.1",
-    "ws": "^6.2.0",
-    "express": "^4.16.4"
+    "netlify-lambda": "^1.4.2",
+    "serverless-http": "^1.9.1",
+    "ws": "^6.2.0"
   }
 }

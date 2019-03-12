@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const serverless = require('serverless-http');
 const WebSocket = require('ws');
 const { searchPhotos } = require('./flickr_service');
 const { config } = require('./config_loader');
@@ -9,8 +10,17 @@ const { messageTypes, bundleDir } = config;
 console.log("Configuration: ", config);
 
 let app = express();
+const router = express.Router();
 let server = app.listen(port, () => console.log(`Express server listening on port ${port}!`));
 const wss = new WebSocket.Server({ server });
+
+module.exports = serverless(app);
+
+router.get('/', (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.write('<h1>Hello from Express.js!</h1>');
+  res.end();
+});
 
 if (config.production) {
   console.log("Serving static content from: ", bundleDir);
