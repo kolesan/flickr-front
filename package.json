@@ -15,7 +15,8 @@
     "server": "node src/back-end/server.js prod",
     "build": "webpack --config webpack.prod.js",
     "test": "jest",
-    "netlifyBuild": "netlify-lambda build express",
+    "netlifyLambda": "netlify-lambda build src/back-end",
+    "netlifyBuild": "npm-run-all build netlifyLambda",
     "testWatch": "jest --watch",
     "coverage": "jest --reporters=\"./test/JestNoOutputReporter.js\" --coverage"
   },
