@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const WebSocket = require('ws');
 const { searchPhotos } = require('./flickr_service');
@@ -8,12 +9,14 @@ const { messageTypes, bundleDir } = config;
 console.log("Configuration: ", config);
 
 let app = express();
-
-console.log("Serving static content from: ", bundleDir);
-app.use(express.static(bundleDir));
-
-let server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+let server = app.listen(port, () => console.log(`Express server listening on port ${port}!`));
 const wss = new WebSocket.Server({ server });
+
+if (config.production) {
+  console.log("Serving static content from: ", bundleDir);
+  app.use(express.static(bundleDir));
+  app.use((req, res) => res.sendFile(`${path.resolve(bundleDir)}/index.html`));
+}
 
 wss.on('connection', function connection(ws) {
   console.log('Connection established');

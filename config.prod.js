@@ -5,5 +5,6 @@ module.exports = Object.assign({}, commonConfig, {
     host: "localhost",
     port: 3000
   },
-  bundleDir: "dist"
+  bundleDir: "dist",
+  production: true
 });
