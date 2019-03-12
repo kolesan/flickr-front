@@ -14,7 +14,6 @@ export default function inst() {
   });
   socket.addEventListener('close', () => {
     log("Connection closed, trying to open a new one");
-    socket = new WebSocket(`ws://${host}:${port}`);
   });
   socket.addEventListener('message', event => {
     let data = fromMessage(event.data);

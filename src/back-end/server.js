@@ -14,19 +14,9 @@ const router = express.Router();
 let server = app.listen(port, () => console.log(`Express server listening on port ${port}!`));
 const wss = new WebSocket.Server({ server });
 
+app.use('/.netlify/functions/server', server);
+
 module.exports = serverless(app);
-
-router.get('/', (req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.write('<h1>Hello from Express.js!</h1>');
-  res.end();
-});
-
-if (config.production) {
-  console.log("Serving static content from: ", bundleDir);
-  app.use(express.static(bundleDir));
-  app.use((req, res) => res.sendFile(`${path.resolve(bundleDir)}/index.html`));
-}
 
 wss.on('connection', function connection(ws) {
   console.log('Connection established');
