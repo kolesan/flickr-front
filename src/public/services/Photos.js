@@ -28,8 +28,8 @@ export default function inst() {
   let onMessageCb = noop;
 
   return Object.freeze({
-    request(count){
-      send({ type: messageTypes.GIVE, count: count });
+    request(count, tags){
+      send({ type: messageTypes.GIVE, count: count, tags });
     },
     onOpen(cb) {
       onOpenCb = cb;

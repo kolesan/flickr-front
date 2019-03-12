@@ -24,21 +24,28 @@ wss.on('connection', function connection(ws) {
   console.log('Connection established');
   let page = 1;
   let requestedPhotoCount = 0;
+  let tags = defaultTags();
 
   ws.on('message', function incoming(message) {
     console.log('Received message: ', message);
     let request = fromMessage(message);
     if (request.type === messageTypes.GIVE) {
       let count = toPositiveInt(request.count);
-      requestedPhotoCount = Math.min(100, requestedPhotoCount + count);
+      let newTags = defaultTags(request.tags);
+      if (newTags !== tags) {
+        tags = newTags;
+        page = 1;
+      }
+
+      requestedPhotoCount += count;
       console.log(`Client requested ${requestedPhotoCount} photos`);
 
-      requestPhotos(20);
+      requestPhotos(tags);
     }
   });
 
-  function requestPhotos(count) {
-    return searchPhotos(count, page++)
+  function requestPhotos(tags) {
+    return searchPhotos({page: page++, tags})
       .then(function (response) {
         const photos = response.data.photos.photo;
         return photos.filter(hasShortTitle).map(toPhotoResponseObject);
@@ -48,7 +55,7 @@ wss.on('connection', function connection(ws) {
         requestedPhotoCount = Math.max(0, requestedPhotoCount - photos.length);
         console.log(`Need to send ${requestedPhotoCount} more photos`);
         if (requestedPhotoCount > 0) {
-          requestPhotos(20);
+          requestPhotos(tags);
         }
       })
       .catch(function (error) {
@@ -69,6 +76,14 @@ wss.on('connection', function connection(ws) {
     });
   }
 });
+
+function defaultTags(tags) {
+  if (tags === null || tags === undefined || tags === "") {
+    return "nature,science,food,cat,car";
+  }
+  return tags;
+}
+
 function toMessage(o) {
   return JSON.stringify(o)
 }

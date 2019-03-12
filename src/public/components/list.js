@@ -18,6 +18,9 @@ export default function inst(container) {
     buffer(pictures) {
       buffer.push(...pictures.map(toListItem));
     },
+    clearBuffer() {
+      buffer = [];
+    },
     show(count) {
       let shown = buffer.splice(0, count);
       log("buffer", buffer.length, shown);
