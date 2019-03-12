@@ -1,3 +1,3 @@
 [build]
-  command = "npm install && npm run netlifyBuild"
+  command = "npm run netlifyBuild"
   functions = "functions"
