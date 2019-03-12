@@ -9,7 +9,7 @@ const { messageTypes, bundleDir } = config;
 console.log("Configuration: ", config);
 
 let app = express();
-let server = app.listen(port, () => console.log(`Express server listening on port ${port}!`));
+let server = app.listen(process.env.PORT || port, () => console.log(`Express server listening on port ${port}!`));
 const wss = new WebSocket.Server({ server });
 
 if (config.production) {

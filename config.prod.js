@@ -3,7 +3,7 @@ const commonConfig = require('./config');
 module.exports = Object.assign({}, commonConfig, {
   server: {
     host: "localhost",
-    port: 8080
+    port: 3000
   },
   bundleDir: "dist",
   production: true
