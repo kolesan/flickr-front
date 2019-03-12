@@ -1,0 +1,12 @@
+.control_panel__item {
+    margin-top: var(--item-margin);
+
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    color: var(--font-color);
+
+    text-transform: uppercase;
+}
+.control_panel__item:last-child {
+    margin-bottom: var(--item-margin);
+}

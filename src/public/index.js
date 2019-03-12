@@ -2,38 +2,33 @@ import './style.css';
 import 'intersection-observer';
 
 import log from "./utils/Logging";
-import { appendChildren } from "./utils/HtmlUtils";
-import { minmax } from "./utils/Utils";
-import { ifAny } from "./utils/FunctionalUtils";
+import { ifAny, ifNone } from "./utils/FunctionalUtils";
 import newPhotoProvider from './services/Photos';
-import newControlPanelInst from "./components/control_panel";
-import newControlPanelIndicator from "./components/control_panel_indicator";
+import newControlPanel from "./components/control_panel";
+import newControlPanelNumberInput from "./components/control_panel_number_input";
 import newList from "./components/list";
 import newObserver from "./ListScrollObserver";
+import newReserve from "./Reserve";
 
 const REQUESTED_PHOTOS_COUNT = 100;
 
-let itemLoadCount = 1;
-
-let controlPanelIndicator = newControlPanelIndicator();
-let controlPanel = newControlPanelInst();
-let { loadCountInput } = controlPanel.components;
-loadCountInput.value = itemLoadCount;
-let minMax1to10 = minmax(1, 10);
-loadCountInput.onBlur(event => {
-  itemLoadCount = minMax1to10(Number(event.target.value));
-  loadCountInput.value = itemLoadCount;
-  log(itemLoadCount);
+let showCount = 1;
+let showCountInput = newControlPanelNumberInput({
+  label: "show count",
+  min: 1, max: 10,
+  value: showCount,
+  name: "showCount",
+  onChange: value => showCount = value
 });
-appendChildren(document.body, controlPanelIndicator, controlPanel.element);
+newControlPanel(document.body, showCountInput);
 
-
+let reserve = newReserve();
+let list = newList(document.body);
 let observer = newObserver(() => {
-  console.log("OBSERVER CB TRIGGERED: LOADING PICTURES");
-
-  list.show(itemLoadCount)
-    [ifAny](shown => {
-      observer.position(getObserverTarget())
+  // console.log("OBSERVER CB TRIGGERED: LOADING PICTURES");
+  showReserved()
+    [ifNone](() => {
+      showListItems(showCount);
     });
 
   if (list.bufferLength < 50) {
@@ -45,14 +40,27 @@ function getObserverTarget() {
   return list.items.slice(-10)[0];
 }
 
-let list = newList(document.body);
 let photos = newPhotoProvider();
+photos.onOpen(() => {
+  photos.request(REQUESTED_PHOTOS_COUNT);
+  reserve.add(20);
+});
 photos.onReceived(pictures => {
   log("Received pictures", pictures);
   list.buffer(pictures);
-  list.show(20)
-    [ifAny](shown => {
-      observer.position(getObserverTarget())
-    });
+  showReserved();
 });
-photos.onOpen(() => photos.request(REQUESTED_PHOTOS_COUNT));
+
+function showReserved() {
+  return showListItems(reserve.reserved)
+    [ifAny](shown => {
+    reserve.remove(shown.length);
+  });
+}
+
+function showListItems(count) {
+  return list.show(count)
+    [ifAny](shown => {
+    observer.position(getObserverTarget())
+  });
+}

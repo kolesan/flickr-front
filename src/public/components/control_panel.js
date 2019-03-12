@@ -1,50 +1,20 @@
 import './control_panel.css';
+import { appendChildren, element } from "../utils/HtmlUtils";
+import newControlPanelIndicator from "./control_panel_indicator";
 
-import { element, textNode } from "../utils/HtmlUtils";
+export let numberInputValue = 1;
 
-export default function inst() {
-  let loadCountInput = loadCountInputCmp();
+export default function inst(container, ...children) {
+  let controlPanelIndicator = newControlPanelIndicator();
+  let controlPanel = panel();
 
-  return {
-    components: {
-      loadCountInput,
-    },
-    element: element({
-      tag: "div",
-      classes: "control_panel",
-      children: [
-        loadCountInput.element
-      ]
-    })
-  };
+  appendChildren(controlPanel, ...children);
+  appendChildren(container, controlPanelIndicator, controlPanel);
 }
 
-function loadCountInputCmp() {
-  let input = element({
-    tag: "input",
-    classes: `control_panel__item input`,
-    attributes: {
-      type: "number",
-      min: 1,
-      max: 10
-    }
+function panel() {
+  return element({
+    tag: "div",
+    classes: "control_panel",
   });
-  let label = element({
-    tag: "label",
-    classes: `control_panel__item label`,
-    children: [
-      textNode("LOAD COUNT"),
-      input
-    ]
-  });
-
-  return {
-    set value(v) {
-      input.value = v;
-    },
-    onBlur(cb) {
-      input.addEventListener("blur", cb);
-    },
-    element: label
-  };
 }

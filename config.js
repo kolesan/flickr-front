@@ -1,6 +1,7 @@
 module.exports = {
   messageTypes: {
-    GIVE: "give"
+    GIVE: "give",
+    PICTURES: "pictures"
   },
   server: {
     host: "213.159.43.178",

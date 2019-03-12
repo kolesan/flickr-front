@@ -28,53 +28,6 @@
 
 
 
-.control_panel__item {
-    margin-top: var(--item-margin);
-
-    font-family: var(--font-family);
-    font-size: var(--font-size);
-    color: var(--font-color);
-}
-.control_panel__item:last-child {
-    margin-bottom: var(--item-margin);
-}
-
-
-
-.control_panel__item.label {
-    width: 90%;
-    padding: 4px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-}
-
-.control_panel__item.input {
-    width: 90%;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-
-    outline: none;
-    text-align: center;
-
-    height: 100%;
-
-    transition: border ease-in-out 150ms, opacity ease-in-out 150ms;
-}
-.control_panel__item.input:hover {
-    border-bottom: 2px solid gray;
-}
-.control_panel__item.input:focus-within {
-    border-bottom: 2px solid gray;
-}
-
-
-
 @media screen and (min-width: 1150px) {
     .control_panel {
         opacity: var(--visible-opacity);
