@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const WebSocket = require('ws');
+const { toPositiveInt } = require("./utils");
 const { searchPhotos } = require('./flickr_service');
 const { config } = require('./config_loader');
 const { port } = config.server;
@@ -18,46 +19,53 @@ if (config.production) {
   app.use((req, res) => res.sendFile(`${path.resolve(bundleDir)}/index.html`));
 }
 
+
 wss.on('connection', function connection(ws) {
   console.log('Connection established');
   let page = 0;
-  let photoSaveForCSsWOrk = [];
-
-  searchPhotos(20, page++)
-    .then(function (response) {
-      const photos = response.data.photos.photo;
-      photoSaveForCSsWOrk.push(...photos.filter(hasShortTitle).map(toPhotoResponseObject));
-
-      sendBackPhotos(10, page);
-    })
-    .catch(function (error) {
-      console.log("ERROR:");
-      console.log(error);
-    });
+  let requestedPhotoCount = 0;
 
   ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
+    console.log('Received message: ', message);
     let request = fromMessage(message);
     if (request.type === messageTypes.GIVE) {
-      //start sendin photos
-      let count = request.count;
-      sendBackPhotos(10, message.page);
+      let count = toPositiveInt(request.count);
+      requestedPhotoCount = Math.min(100, requestedPhotoCount + count);
+      console.log(`Client requested ${requestedPhotoCount} photos`);
+
+      requestPhotos(20);
     }
   });
 
-  function sendBackPhotos(count, page = 0) {
-    let startIndex = page * count;
-    let endIndex = startIndex + count;
-    // if (endIndex > photoSaveForCSsWOrk.length - 50) {
-    //   loadSomeTestPhotos();
-    // }
-    console.log('Sending some photos');
-    console.log({count, page, startIndex, endIndex, all: photoSaveForCSsWOrk.length});
+  function requestPhotos(count) {
+    return searchPhotos(count, page++)
+      .then(function (response) {
+        const photos = response.data.photos.photo;
+        return photos.filter(hasShortTitle).map(toPhotoResponseObject);
+      })
+      .then(photos => {
+        sendBackPhotos(photos);
+        requestedPhotoCount = Math.max(0, requestedPhotoCount - photos.length);
+        console.log(`Need to send ${requestedPhotoCount} more photos`);
+        if (requestedPhotoCount > 0) {
+          requestPhotos(20);
+        }
+      })
+      .catch(function (error) {
+        console.log("ERROR:");
+        console.log(error);
+      });
+  }
 
-    let msg = toMessage(photoSaveForCSsWOrk.slice(startIndex, endIndex));
+  function sendBackPhotos(photos) {
+    console.log(`Sending ${photos.length} photos to the client`);
+
+    let msg = toMessage({photos, type: messageTypes.PICTURES});
 
     ws.send(msg, err => {
-      console.log('Oh no. ', err);
+      if (err) {
+        console.log('Oh no. ', err);
+      }
     });
   }
 });

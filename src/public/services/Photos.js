@@ -17,9 +17,11 @@ export default function inst() {
     socket = new WebSocket(`ws://${host}:${port}`);
   });
   socket.addEventListener('message', event => {
-    let data = fromMessage(event.data);
-    console.log('Received:', data);
-    onMessageCb(data);
+    let message = decode(event.data);
+    console.log('Received message: ', message);
+    if (message.type === messageTypes.PICTURES) {
+      onMessageCb(message.photos);
+    }
   });
 
   let onOpenCb = noop;
@@ -41,7 +43,7 @@ export default function inst() {
   }
 }
 
-function fromMessage(msg) {
+function decode(msg) {
   return JSON.parse(msg);
 }
 function message(o) {
