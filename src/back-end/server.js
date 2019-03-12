@@ -22,7 +22,7 @@ if (config.production) {
 
 wss.on('connection', function connection(ws) {
   console.log('Connection established');
-  let page = 0;
+  let page = 1;
   let requestedPhotoCount = 0;
 
   ws.on('message', function incoming(message) {
