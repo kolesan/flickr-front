@@ -1,14 +1,19 @@
+const express = require('express');
 const WebSocket = require('ws');
-const { searchPhotos } = require("./flickr_service");
-const config = require('../../config');
-
+const { searchPhotos } = require('./flickr_service');
+const { config } = require('./config_loader');
 const { port } = config.server;
-const { messageTypes } = config;
+const { messageTypes, bundleDir } = config;
 
+console.log("Configuration: ", config);
 
+let app = express();
 
-console.log("Startin server on port: ", port);
-const wss = new WebSocket.Server({ port });
+console.log("Serving static content from: ", bundleDir);
+app.use(express.static(bundleDir));
+
+let server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function connection(ws) {
   console.log('Connection established');

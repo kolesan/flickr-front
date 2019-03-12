@@ -5,12 +5,14 @@
   "description": "Test flickr app",
   "main": "./src/back-end.js",
   "scripts": {
-    "start": "npm-run-all expressDevNewCMD webpackDevNewCMD testWatchNewCMD",
-    "webpackDevNewCMD": "start npm run webpackDev",
-    "expressDevNewCMD": "start npm run expressDev",
+    "start": "npm-run-all serverDevNewCMD clientDevNewCMD testWatchNewCMD",
+    "clientDevNewCMD": "start npm run clientDev",
+    "serverDevNewCMD": "start npm run serverDev",
     "testWatchNewCMD": "start npm run testWatch",
-    "webpackDev": "webpack-dev-server --host 0.0.0.0 --config webpack.dev.js",
-    "expressDev": "nodemon src/back-end/server.js --watch src/back-end",
+    "clientDev": "webpack-dev-server --host 0.0.0.0 --config webpack.dev.js",
+    "serverDev": "nodemon src/back-end/server.js --watch src/back-end dev",
+    "startProd": "npm-run-all build server",
+    "server": "node src/back-end/server.js prod",
     "build": "webpack --config webpack.prod.js",
     "test": "jest",
     "testWatch": "jest --watch",
@@ -46,6 +48,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "intersection-observer": "^0.5.1",
-    "ws": "^6.2.0"
+    "ws": "^6.2.0",
+    "express": "^4.16.4"
   }
 }

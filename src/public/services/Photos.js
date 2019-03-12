@@ -1,10 +1,11 @@
 import log from '../utils/Logging';
 import { noop } from '../utils/Utils';
 
-const config = require('../../../config');
+const config = CONFIG;
 const { host, port } = config.server;
 const { messageTypes } = config;
 
+log("Configuration: ", config);
 export default function inst() {
   let socket = new WebSocket(`ws://${host}:${port}`);
   socket.addEventListener('open', () => {
