@@ -10,7 +10,7 @@ module.exports = merge(common,{
     })
   ],
   devServer: {
-    contentBase: ['./dist', './src/back-end'],
+    contentBase: ['./dist', './src/back_end'],
     watchContentBase: true,
     historyApiFallback: true
   },

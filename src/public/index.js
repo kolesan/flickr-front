@@ -10,8 +10,8 @@ import newControlPanelInput from "./components/control_panel_input";
 import newControlPanelNumberInput from "./components/control_panel_number_input";
 import newList from "./components/list";
 import newObserver from "./ListScrollObserver";
-import newReserve from "./Reserve";
 import { throttle } from "./utils/Utils";
+const { newReserve } = require("../common_utils/Reserve");
 
 const REQUESTED_PHOTOS_COUNT = 20;
 
@@ -32,14 +32,14 @@ let tagsInput = newControlPanelInput({
   }
 });
 
-let reserve = newReserve();
+let reserve = newReserve(100);
 let list = newList(document.body);
 newControlPanel(document.body,
   newControlPanelLabel({label: "show on scroll", input: showCountInput}),
   newControlPanelLabel({label: "tags", input: tagsInput})
 );
 let observer = newObserver(() => {
-  // console.log("OBSERVER CB TRIGGERED: LOADING PICTURES");
+  // console.log("OBSERVER CB TRIGGERED: LOADING PHOTOS");
   showReserved()
     [ifNone](() => {
       showListItems(showCount);

@@ -18,8 +18,8 @@ export default function inst() {
   });
   socket.addEventListener('message', event => {
     let message = decode(event.data);
-    console.log('Received message: ', message);
-    if (message.type === messageTypes.PICTURES) {
+    console.log('\nReceived message: ', message);
+    if (message.type === messageTypes.PHOTOS) {
       onMessageCb(message.photos);
     }
   });
