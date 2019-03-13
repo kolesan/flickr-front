@@ -5,7 +5,7 @@ const { newPhotoProviderConnectionDecorator } = require('./photo_provider_connec
 const { newPhotoProvider } = require('./photo_provider');
 const { newFlickrSearchService } = require('./flickr_service');
 const { config } = require('./config_loader');
-const { port } = config.server;
+const port = process.env.PORT || config.server.port;
 const { bundleDir } = config;
 
 console.log("Configuration: ", config);
