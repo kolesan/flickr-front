@@ -1,6 +1,9 @@
 # flickr-front
 Test flickr app
 
+### Installing
+Use `npm install` to get all the node modules needed for this project to work
+
 ### Running
 Use `npm start` (only for Windows OS) to start development processes 
 in new CMDs: back end node module under nodemon, 
