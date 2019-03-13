@@ -14,7 +14,7 @@ export default function inst() {
   });
   socket.addEventListener('close', () => {
     log("Connection closed, trying to open a new one");
-    socket = new WebSocket(`ws://${host}:${port}`);
+    socket = new WebSocket(`wss://flickr-test-app.herokuapp.com`);
   });
   socket.addEventListener('message', event => {
     let message = decode(event.data);
