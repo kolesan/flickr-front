@@ -23,7 +23,9 @@ export default function inst(cb) {
 
   return Object.freeze({
     position(target) {
-      target.appendChild(bottomLoadDebugElem);
+      if (!CONFIG.production) {
+        target.appendChild(bottomLoadDebugElem)
+      };
 
       observer.disconnect();
       observer.observe(target);
