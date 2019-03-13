@@ -21,31 +21,45 @@ export default function inst() {
     console.log('\nReceived message: ', message);
     if (message.type === messageTypes.PHOTOS) {
       onMessageCb(message.photos);
+    } else if (message.type === messageTypes.END) {
+      onEndCb();
     }
   });
 
   let onOpenCb = noop;
   let onMessageCb = noop;
+  let onEndCb = noop;
 
   return Object.freeze({
     request(count, tags){
-      send({ type: messageTypes.GIVE, count: count, tags });
+      send({
+        type: messageTypes.GIVE,
+        count: count,
+        tags
+      });
     },
     onOpen(cb) {
       onOpenCb = cb;
+      return this;
     },
     onReceived(cb) {
       onMessageCb = cb;
+      return this;
+    },
+    onEnd(cb) {
+      onEndCb = cb;
+      return this;
     }
   });
+
   function send(o) {
-    socket.send(message(o));
+    socket.send(encode(o));
   }
 }
 
 function decode(msg) {
   return JSON.parse(msg);
 }
-function message(o) {
+function encode(o) {
   return JSON.stringify(o);
 }

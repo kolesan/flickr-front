@@ -51,16 +51,20 @@ let observer = newObserver(() => {
 });
 
 
-let photos = newPhotoProvider();
-photos.onOpen(() => {
-  requestPhotos();
-  reserve.add(20);
-});
-photos.onReceived(pictures => {
-  log("Received pictures", pictures);
-  list.buffer(pictures);
-  showReserved();
-});
+let photos = newPhotoProvider()
+  .onOpen(() => {
+    requestPhotos();
+    reserve.add(20);
+  })
+  .onReceived(pictures => {
+    log("Received pictures", pictures);
+    list.buffer(pictures);
+    showReserved();
+  })
+  .onEnd(() => {
+    list.showEnd();
+    observer.disable();
+  });
 
 let requestPhotos = throttle(500, () => photos.request(REQUESTED_PHOTOS_COUNT, tags));
 

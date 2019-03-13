@@ -29,6 +29,10 @@ function newPhotoProvider(photoService) {
     onPhotosFound(cb) {
       onPhotosFoundCb = cb;
       return this;
+    },
+    stop() {
+      reserve.reset();
+      return this;
     }
   });
 

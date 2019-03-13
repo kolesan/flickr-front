@@ -1,5 +1,8 @@
+import './list.css';
+
 import log from "../utils/Logging";
-import toListItem from "./list_item";
+import listPhotoItem from "./list_photo_item";
+import listEndItem from "./list_end_item";
 import { appendChildren, element } from "../utils/HtmlUtils";
 
 export default function inst(container) {
@@ -7,6 +10,8 @@ export default function inst(container) {
 
   let list = listElement();
   container.appendChild(list);
+
+  let ended = false;
 
   return Object.freeze({
     get items() {
@@ -16,7 +21,7 @@ export default function inst(container) {
       return buffer.length;
     },
     buffer(pictures) {
-      buffer.push(...pictures.map(toListItem));
+      buffer.push(...pictures.map(listPhotoItem));
     },
     clearBuffer() {
       buffer = [];
@@ -27,7 +32,12 @@ export default function inst(container) {
       appendChildren(list, ...shown);
       return shown;
     },
-
+    showEnd() {
+      if (!ended) {
+        appendChildren(list, listEndItem());
+        ended = true;
+      }
+    }
   });
 }
 

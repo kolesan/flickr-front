@@ -1,6 +1,7 @@
 module.exports = {
   messageTypes: {
     GIVE: "give",
-    PHOTOS: "photos"
+    PHOTOS: "photos",
+    END: "end"
   }
 };
