@@ -3,21 +3,20 @@ import './control_panel_number_input.css';
 
 import log from "../utils/Logging";
 import { minmax } from "../utils/MathUtils";
-import { element, textNode } from "../utils/HtmlUtils";
+import { decorateElement } from "../utils/HtmlUtils";
+import newInput from "./control_panel_input";
 
-export default function inst({min, max, value, name, label, onChange}) {
+export default function inst({min, max, value, name, onChange}) {
   let minMax = minmax(min, max);
 
-  let input = element({
-    tag: "input",
-    classes: `control_panel__item input`,
+  let input = newInput({value, name});
+
+  return decorateElement(input, {
     attributes: {
       type: "number",
-      name,
       min,
       max
     },
-    value,
     listeners: {
       blur: event => {
         value = minMax(Number(event.target.value));
@@ -26,14 +25,5 @@ export default function inst({min, max, value, name, label, onChange}) {
         log(`new value in ${name}: `, value);
       }
     }
-  });
-
-  return element({
-    tag: "label",
-    classes: `control_panel__item label`,
-    children: [
-      textNode(label),
-      input
-    ]
   });
 }

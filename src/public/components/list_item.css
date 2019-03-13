@@ -1,0 +1,40 @@
+.list__item {
+    width: 100%;
+    height: 300px;
+    background-color: #5f5e5e;
+    border-radius: 2px;
+    box-shadow: #201720 1px 1px 2px 1px;
+
+    margin-top: var(--item-margin);
+
+    overflow: hidden;
+
+    position: relative;
+
+    text-transform: uppercase;
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Fira Sans', sans-serif;
+    letter-spacing: 0.3rem;
+    color: floralwhite;
+
+    text-shadow: -1px -1px 2px #3f3f3f,
+    -1px  1px 2px #3f3f3f,
+    1px -1px 2px #3f3f3f,
+    1px  1px 2px #3f3f3f;
+}
+.list__item:last-child {
+    margin-bottom: var(--item-margin);
+}
+.list__item:hover {
+    box-shadow: #201720 2px 2px 3px 2px;
+}
+.list__item:hover > .list__item__img {
+    width: 100%;
+}
+.list__item:hover > .list__item__title {
+    font-size: 4rem;
+    width: 100%;
+
+    left: 0;
+}

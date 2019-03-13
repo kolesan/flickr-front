@@ -1,0 +1,43 @@
+.list__item__img {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 40%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition: width 0.1s ease-out;
+}
+
+.list__item__title {
+    position: absolute;
+    top: 0;
+    left: 40%;
+
+    width: 60%;
+    height: 100%;
+
+    padding: 1rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    user-select: none;
+}
+
+@media screen and (orientation: portrait), screen and (max-width: 500px) {
+    .list__item__img {
+        width: 100%;
+    }
+    .list__item__title {
+        font-size: 4rem;
+        width: 100%;
+
+        left: 0;
+    }
+}

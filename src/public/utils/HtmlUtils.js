@@ -1,25 +1,36 @@
 import { log } from "./Logging";
 
-export function element({tag, classes, children = [], attributes = {}, listeners = {}, data = {}, style = {}, value, text}) {
-  let elem = document.createElement(tag);
+export function element(options) {
+  const { tag, ...otherOptions } = options;
+  let element = document.createElement(tag);
+  return decorateElement(element, otherOptions);
+}
 
-  classes && classes.split(" ").forEach(c => elem.classList.add(c));
-  children.forEach(it => elem.appendChild(it));
-  Object.keys(attributes).forEach(k => elem.setAttribute(k, attributes[k]));
-  Object.keys(listeners).forEach(k => elem.addEventListener(k, listeners[k]));
-  Object.keys(data).forEach(k => elem.dataset[k] = data[k]);
+export function decorateElement(element, options) {
+  const {
+    classes, children = [],
+    attributes = {}, listeners = {},
+    data = {}, style = {},
+    value, text
+  } = options;
 
-  Object.assign(elem.style, style);
+  classes && classes.split(" ").forEach(c => element.classList.add(c));
+  children.forEach(it => element.appendChild(it));
+  Object.keys(attributes).forEach(k => element.setAttribute(k, attributes[k]));
+  Object.keys(listeners).forEach(k => element.addEventListener(k, listeners[k]));
+  Object.keys(data).forEach(k => element.dataset[k] = data[k]);
+
+  Object.assign(element.style, style);
 
   if (value !== undefined && value !== null) {
-    elem.value = value;
+    element.value = value;
   }
 
   if (typeof text == "string" && text.length > 0) {
-    elem.appendChild(textNode(text));
+    element.appendChild(textNode(text));
   }
 
-  return elem;
+  return element;
 }
 
 export function textNode(v) {
@@ -29,4 +40,10 @@ export function textNode(v) {
 export function appendChildren(parent, ...children) {
   children.forEach(child => parent.appendChild(child));
   return children;
+}
+
+export function removeElement(node) {
+  if (node && node.parentNode) {
+    node.parentNode.removeChild(node);
+  }
 }

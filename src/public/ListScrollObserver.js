@@ -1,4 +1,5 @@
 import { intersectionObserverDebugElement } from "./components/debug";
+import { removeElement } from "./utils/HtmlUtils";
 
 const ITEM_HEIGHT = 300 + 8; //Height + margin
 const OBSERVER_MARGIN = 3 * ITEM_HEIGHT;
@@ -23,10 +24,16 @@ export default function inst(cb) {
 
   return Object.freeze({
     position(target) {
-      target.appendChild(bottomLoadDebugElem);
+      if (!CONFIG.production) {
+        target.appendChild(bottomLoadDebugElem)
+      };
 
       observer.disconnect();
       observer.observe(target);
+    },
+    disable() {
+      removeElement(bottomLoadDebugElem);
+      observer.disconnect();
     }
   });
 }
